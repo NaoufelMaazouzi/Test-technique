@@ -1,13 +1,11 @@
 const router = require('express').Router();
 let Product = require('../models/products.model');
 
-
 router.route('/').get((req, res) => {
     Product.find()
         .then(products => res.json(products))
         .catch(err => res.status(400).json('Error: ' + err))
 });
-
 
 //ADD NEW EXERCISE
 router.route('/add').post((req, res) => {
@@ -17,7 +15,6 @@ router.route('/add').post((req, res) => {
     const rating = Number(req.body.rating);
     const warranty_years = Number(req.body.warranty_years);
     const available = Boolean(req.body.available);
-
 
     const newProduct = new Product({
         name,
@@ -65,6 +62,5 @@ router.route('/update/:id').post((req, res) => {
         })
         .catch(err => res.status(400).json('Error: ' + err));
 });
-
 
 module.exports = router;

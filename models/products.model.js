@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-
 const Schema = mongoose.Schema;
 
+//CREATE PRODUCT SCHEMA FOR MONGODB
 const productSchema = new Schema({
     name: { type: String, required: true },
     type: { type: String, required: true },

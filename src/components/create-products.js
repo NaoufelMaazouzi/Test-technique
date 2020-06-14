@@ -6,12 +6,15 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import Button from '@material-ui/core/Button';
+import { connect } from 'react-redux';
+import { fetchProducts, createProducts } from '../redux/fetchProducts/fetchProductsActions';
 import io from "socket.io-client";
 const ENDPOINT = "localhost:5000";
-
 let socket;
 
-function CreateProducts(props) {
+function CreateProducts({ fetchProducts, createProducts }) {
+
 
     const [name, setName] = useState();
     const [type, setType] = useState();
@@ -20,6 +23,7 @@ function CreateProducts(props) {
     const [warranty_years, setWarranty_years] = useState();
     const [available, setAvailable] = useState();
 
+    //GLOBAL STYLE
     const useStyles = makeStyles((theme) => ({
         root: {
             textAlign: 'center',
@@ -30,67 +34,47 @@ function CreateProducts(props) {
         },
         title: {
             textAlign: 'center',
-            marginTop: 60
+            marginTop: 60,
+            paddingBottom: 20
+        },
+        btn: {
+            marginTop: 40,
+            minHeight: 50,
+            minWidth: 200
         }
     }));
 
-
+    //FETCH PRODUCTS WHEN COMPONENT IS MOUNTED
     useEffect(() => {
-        axios.get('http://localhost:5000/products/')
-            .then(response => {
-                setName(response.data.name);
-                setType(response.data.type);
-                setPrice(response.data.price);
-                setRating(response.data.rating);
-                setWarranty_years(response.data.warranty_years);
-                setAvailable(response.data.available);
-            })
-            .catch((err) => {
-                console.log(err);
-            })
-
-        /* axios.get('http://localhost:5000/users/')
-             .then(response => {
-                 if (response.data.length > 0) {
-                     setUsers(response.data.map(user => user.username))
-                 }
-             })
-             .catch((err) => {
-                 console.log(err);
-             })*/
+        fetchProducts();
     }, [])
 
+    //TRIGGERED FUNCTIONS ON CHANGE OF INPUT
     function onChangeName(e) {
         setName(e.target.value);
     }
-
     function onChangeType(e) {
         setType(e.target.value);
     }
-
     function onChangePrice(e) {
         setPrice(e.target.value);
     }
-
     function onChangeRating(e) {
         setRating(e.target.value);
     }
-
     function onChangeWarranty_years(e) {
         setWarranty_years(e.target.value);
     }
-
     function onChangeAvailable(e) {
         setAvailable(e.target.value);
     }
 
+    //"addProducts" EMIT TRIGGERED ON SUBMIT THE FORM
     function onsubmit(e) {
         socket = io(ENDPOINT);
-
         socket.emit('addProducts', { name: name, type, price, rating, warranty_years, available });
 
         e.preventDefault();
-
         const product = {
             name,
             type,
@@ -99,17 +83,8 @@ function CreateProducts(props) {
             warranty_years,
             available
         }
-
-
-
-        axios.post('http://localhost:5000/products/add', product)
-            .then(res => console.log(res.data))
-            .catch((err) => {
-                console.log(err);
-            })
-
-        window.location = '/'
-
+        //REDUX ACTIONS TO CREATE A PRODUCT
+        createProducts(product);
     }
 
     const classes = useStyles();
@@ -119,11 +94,11 @@ function CreateProducts(props) {
             <h1 className={classes.title}>Créer un produit</h1>
 
             <form className={classes.root} noValidate autoComplete="off" onSubmit={onsubmit}>
-                <TextField id="outlined-basic" label="Nom" variant="outlined" value={name} onChange={onChangeName} />
-                <TextField id="outlined-basic" label="Type" variant="outlined" value={type} onChange={onChangeType} />
-                <TextField type="number" id="outlined-basic" label="Prix" variant="outlined" value={price} onChange={onChangePrice} />
-                <TextField id="outlined-basic" label="Note" variant="outlined" value={rating} onChange={onChangeRating} />
-                <TextField type="number" id="outlined-basic" label="Garantie" variant="outlined" value={warranty_years} onChange={onChangeWarranty_years} />
+                <TextField id="outlined-basic" label="Nom" variant="outlined" value={name} onChange={onChangeName} required />
+                <TextField id="outlined-basic" label="Type" variant="outlined" value={type} onChange={onChangeType} required />
+                <TextField type="number" id="outlined-basic" label="Prix" variant="outlined" value={price} onChange={onChangePrice} required />
+                <TextField id="outlined-basic" label="Note" variant="outlined" value={rating} onChange={onChangeRating} required />
+                <TextField type="number" id="outlined-basic" label="Garantie" variant="outlined" value={warranty_years} onChange={onChangeWarranty_years} required />
                 <FormControl className={classes.formControl}>
                     <InputLabel id="demo-simple-select-label">Disponible</InputLabel>
                     <Select
@@ -136,11 +111,24 @@ function CreateProducts(props) {
                         <MenuItem value={false}>Non</MenuItem>
                     </Select>
                 </FormControl>
-                <input type="submit" className="from-control" value="Créer le produit" />
+                <Button variant="contained" color="primary" type="submit" className={classes.btn}>Créer le produit</Button>
+
             </form>
         </div>
     )
 }
 
+const mapStateToProps = (state) => {
+    return {
+        products: state.fetchProductsReducers.products
+    }
+}
 
-export default CreateProducts;
+const mapDispatchToProps = (dispatch) => {
+    return {
+        fetchProducts: () => dispatch(fetchProducts()),
+        createProducts: (product) => dispatch(createProducts(product))
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreateProducts);

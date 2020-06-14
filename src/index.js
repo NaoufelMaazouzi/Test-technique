@@ -3,11 +3,23 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
+import { Provider } from 'react-redux';
+import { composeWithDevTools } from 'redux-devtools-extension';
+import fetchProductsReducers from './redux/fetchProducts/fetchProductsReducers';
+import changeProductsReducers from './redux/createProducts/createProductsReducers';
+import rootReducer from './redux/rootReducer';
+
+
+//CREATE THE STORE WITH THE FETCH PRODUCTS REDUCER
+let store = createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)));
+console.log(store.getState())
 
 ReactDOM.render(
-  <React.StrictMode>
+  <Provider store={store}>
     <App />
-  </React.StrictMode>,
+  </Provider>,
   document.getElementById('root')
 );
 
