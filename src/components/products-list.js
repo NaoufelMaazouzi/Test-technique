@@ -54,6 +54,7 @@ function ProductsList({ fetchProducts, deleteProducts, products }) {
     //FETCH PRODUCTS WHEN COMPONENT IS MOUNTED
     useEffect(() => {
         fetchProducts();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     //LISTEN TO SERVER EMIT TO FETCH PRODUCTS & DISPLAY THEM LIVE
@@ -91,7 +92,7 @@ function ProductsList({ fetchProducts, deleteProducts, products }) {
                                 <StyledTableCell align="right">{currentproduct.rating}</StyledTableCell>
                                 <StyledTableCell align="right">{currentproduct.warranty_years}</StyledTableCell>
                                 <StyledTableCell align="right">{currentproduct.available.toString()}</StyledTableCell>
-                                <StyledTableCell align="right"><Link className={classes.linkChange} to={'/edit/' + currentproduct._id}>Modifier</Link> | <a href="#" className={classes.linkChange} onClick={() => { deleteProducts(currentproduct._id) }}>Supprimer</a></StyledTableCell>
+                                <StyledTableCell align="right"><Link className={classes.linkChange} to={'/edit/' + currentproduct._id}>Modifier</Link> | <a href="/#" className={classes.linkChange} onClick={() => { deleteProducts(currentproduct._id) }}>Supprimer</a></StyledTableCell>
                             </StyledTableRow>
                         ))}
                     </TableBody>

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { withStyles, makeStyles } from '@material-ui/core/styles';
+import React, { useEffect } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -8,20 +7,15 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 import { connect } from 'react-redux';
-import { fetchProducts, editProducts } from '../redux/fetchProducts/fetchProductsActions';
+import { fetchProducts } from '../redux/fetchProducts/fetchProductsActions';
+import { fetchNewProduct } from '../redux/editProducts/editProductsActions';
 import io from "socket.io-client";
-import { changeName, changeType, changePrice, changeRating, changeWarranty, changeAvailable } from '../redux/createProducts/createProductsActions';
+import { changeName, changeType, changePrice, changeRating, changeWarranty, changeAvailable, editProducts } from '../redux/editProducts/editProductsActions';
 const ENDPOINT = "localhost:5000";
 let socket;
 
-const EditProducts = ({ match, editProducts /* product, , changeName, changeType, changePrice, changeRating, changeWarranty, changeAvailable*/ }) => {
-
-    const [name, setName] = useState();
-    const [type, setType] = useState();
-    const [price, setPrice] = useState();
-    const [rating, setRating] = useState();
-    const [warranty_years, setWarranty_years] = useState();
-    const [available, setAvailable] = useState();
+//IMPORT OF ALL STATE & ACTIONS FROM THE REDUX STORE
+const EditProducts = ({ match, editProducts, product, changeName, changeType, changePrice, changeRating, changeWarranty, changeAvailable, name, type, price, rating, warranty_years, available, fetchNewProduct }) => {
 
     //GLOBAL STYLE
     const useStyles = makeStyles((theme) => ({
@@ -45,61 +39,37 @@ const EditProducts = ({ match, editProducts /* product, , changeName, changeType
     }));
 
     useEffect(() => {
-        axios.get('http://localhost:5000/products/' + match.params.id)
-            .then(response => {
-                setName(response.data.name);
-                setType(response.data.type);
-                setPrice(response.data.price);
-                setRating(response.data.rating);
-                setWarranty_years(response.data.warranty_years);
-                setAvailable(response.data.available);
-            })
-            .catch((err) => {
-                console.log(err);
-            })
+        fetchNewProduct(match.params.id);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    //TRIGGERED FUNCTIONS ON CHANGE OF INPUT
+    //TRIGGERED ACTIONS FROM REDUX WITH INPUTS VALUES
     function onChangeName(e) {
-        setName(e.target.value);
-        // changeName(e.target.value);
+        changeName(e.target.value);
     }
     function onChangeType(e) {
-        setType(e.target.value);
-        // changeType(e.target.value);
+        changeType(e.target.value);
     }
     function onChangePrice(e) {
-        setPrice(e.target.value);
-        // changePrice(e.target.value);
+        changePrice(e.target.value);
     }
     function onChangeRating(e) {
-        setRating(e.target.value);
-        // changeRating(e.target.value);
+        changeRating(e.target.value);
     }
     function onChangeWarranty_years(e) {
-        setWarranty_years(e.target.value);
-        // changeWarranty(e.target.value);
+        changeWarranty(e.target.value);
     }
     function onChangeAvailable(e) {
-        setAvailable(e.target.value);
-        // changeAvailable(e.target.value);
+        changeAvailable(e.target.value);
     }
 
     //"modifyProduct" EMIT TRIGGERED ON SUBMIT THE FORM
     function onsubmit(e) {
         socket = io(ENDPOINT);
         socket.emit('modifyProducts');
-
         e.preventDefault();
-        const product = {
-            name,
-            type,
-            price,
-            rating,
-            warranty_years,
-            available
-        }
 
+        //REDUX ACTIONS TO CREATE A PRODUCT
         editProducts(match.params.id, product)
     }
 
@@ -132,28 +102,31 @@ const EditProducts = ({ match, editProducts /* product, , changeName, changeType
     )
 }
 
+//IMPORT ALL STATES FROM REDUX
 const mapStateToProps = (state) => {
     return {
         name: state.changeProductsReducers.name,
-        /*type: state.changeProductsReducers.type,
+        type: state.changeProductsReducers.type,
         price: state.changeProductsReducers.price,
-        rating: state.changeProductsReducers.name,
+        rating: state.changeProductsReducers.rating,
         warranty_years: state.changeProductsReducers.warranty_years,
         available: state.changeProductsReducers.available,
-        product: state.changeProductsReducers.product*/
+        product: state.changeProductsReducers
     }
 }
 
+//IMPORT ALL ACTIONS FROM REDUX
 const mapDispatchToProps = (dispatch) => {
     return {
         fetchProducts: () => dispatch(fetchProducts()),
         editProducts: (param, product) => dispatch(editProducts(param, product)),
-        /*changeName: (name) => dispatch(changeName(name)),
+        changeName: (name) => dispatch(changeName(name)),
         changeType: (type) => dispatch(changeType(type)),
         changePrice: (price) => dispatch(changePrice(price)),
         changeRating: (rating) => dispatch(changeRating(rating)),
         changeWarranty: (warranty) => dispatch(changeWarranty(warranty)),
-        changeAvailable: (available) => dispatch(changeAvailable(available))*/
+        changeAvailable: (available) => dispatch(changeAvailable(available)),
+        fetchNewProduct: (param) => dispatch(fetchNewProduct(param))
     }
 }
 

@@ -1,8 +1,4 @@
-import { CREATE_PRODUCTS_SUCCES, CREATE_PRODUCTS_FAIL } from './types';
 import Axios from 'axios';
-import io from "socket.io-client";
-const ENDPOINT = "localhost:5000";
-let socket;
 
 export const changeNameActions = (name) => {
     return {
@@ -46,62 +42,47 @@ export const changeAvailableActions = (available) => {
     }
 }
 
-export const createProductsFail = (error) => {
-    return {
-        type: CREATE_PRODUCTS_FAIL,
-        payload: error
-    }
-}
-
 export const changeName = (name) => {
     return (dispatch) => {
         dispatch(changeNameActions(name));
-        console.log("nom changéééé")
     }
 }
-
 export const changeType = (type) => {
     return (dispatch) => {
         dispatch(changeTypeActions(type));
-        console.log("type changéééé")
     }
 }
 export const changePrice = (price) => {
     return (dispatch) => {
         dispatch(changePriceActions(price));
-        console.log("price changéééé")
     }
 }
 export const changeRating = (rating) => {
     return (dispatch) => {
         dispatch(changeRatingActions(rating));
-        console.log("rating changéééé")
     }
 }
 export const changeWarranty = (warranty) => {
     return (dispatch) => {
         dispatch(changeWarrantyActions(warranty));
-        console.log("warranty changéééé")
     }
 }
 export const changeAvailable = (available) => {
     return (dispatch) => {
         dispatch(changeAvailableActions(available));
-        console.log("available changéééé")
     }
 }
 
-
+//CREATE A PRODUCT
 export const createProducts = (product) => {
     return (dispatch) => {
-        socket = io(ENDPOINT);
-
         Axios.post('http://localhost:5000/products/add', product)
             .then(res => console.log(res.data))
             .catch((err) => {
                 console.log(err);
             })
 
+        //RETURN TO THE "/" LOCATION
         window.location = '/'
     }
 }
@@ -119,3 +100,34 @@ export const editProducts = (param, product) => {
         window.location = '/'
     }
 }
+
+//FETCH THE NEW PRODUCT THAT WE ADDED
+let nameFetched, typeFetched, priceFetched, ratingFetched, warrantyFetched, availableFetched;
+export const fetchNewProduct = (param) => {
+    return (dispatch) => {
+        Axios.get('http://localhost:5000/products/' + param)
+            .then(response => {
+                nameFetched = response.data.name;
+                dispatch(changeName(nameFetched));
+
+                typeFetched = response.data.type;
+                dispatch(changeType(typeFetched));
+
+                priceFetched = response.data.price;
+                dispatch(changePrice(priceFetched));
+
+                ratingFetched = response.data.rating;
+                dispatch(changeRating(ratingFetched));
+
+                warrantyFetched = response.data.warranty_years;
+                dispatch(changeWarranty(warrantyFetched));
+
+                availableFetched = response.data.available;
+                dispatch(changeAvailable(availableFetched));
+            })
+            .catch((err) => {
+                console.log(err);
+            })
+    }
+}
+

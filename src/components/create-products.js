@@ -1,27 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useEffect } from 'react';
 import TextField from '@material-ui/core/TextField';
-import { withStyles, makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
 import { connect } from 'react-redux';
-import { fetchProducts, createProducts } from '../redux/fetchProducts/fetchProductsActions';
+import { fetchProducts } from '../redux/fetchProducts/fetchProductsActions';
+import { changeName, changeType, changePrice, changeRating, changeWarranty, changeAvailable, createProducts } from '../redux/editProducts/editProductsActions';
 import io from "socket.io-client";
 const ENDPOINT = "localhost:5000";
 let socket;
 
-function CreateProducts({ fetchProducts, createProducts }) {
-
-
-    const [name, setName] = useState();
-    const [type, setType] = useState();
-    const [price, setPrice] = useState();
-    const [rating, setRating] = useState();
-    const [warranty_years, setWarranty_years] = useState();
-    const [available, setAvailable] = useState();
+//IMPORT OF ALL STATE & ACTIONS FROM THE REDUX STORE
+function CreateProducts({ fetchProducts, changeName, changeType, changePrice, changeRating, changeWarranty, changeAvailable, createProducts, name, type, price, rating, warranty_years, available, product }) {
 
     //GLOBAL STYLE
     const useStyles = makeStyles((theme) => ({
@@ -47,42 +40,35 @@ function CreateProducts({ fetchProducts, createProducts }) {
     //FETCH PRODUCTS WHEN COMPONENT IS MOUNTED
     useEffect(() => {
         fetchProducts();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
-    //TRIGGERED FUNCTIONS ON CHANGE OF INPUT
+    //TRIGGERED ACTIONS FROM REDUX WITH INPUTS VALUES
     function onChangeName(e) {
-        setName(e.target.value);
+        changeName(e.target.value);
     }
     function onChangeType(e) {
-        setType(e.target.value);
+        changeType(e.target.value);
     }
     function onChangePrice(e) {
-        setPrice(e.target.value);
+        changePrice(e.target.value);
     }
     function onChangeRating(e) {
-        setRating(e.target.value);
+        changeRating(e.target.value);
     }
     function onChangeWarranty_years(e) {
-        setWarranty_years(e.target.value);
+        changeWarranty(e.target.value);
     }
     function onChangeAvailable(e) {
-        setAvailable(e.target.value);
+        changeAvailable(e.target.value);
     }
 
     //"addProducts" EMIT TRIGGERED ON SUBMIT THE FORM
     function onsubmit(e) {
         socket = io(ENDPOINT);
         socket.emit('addProducts', { name: name, type, price, rating, warranty_years, available });
-
         e.preventDefault();
-        const product = {
-            name,
-            type,
-            price,
-            rating,
-            warranty_years,
-            available
-        }
+
         //REDUX ACTIONS TO CREATE A PRODUCT
         createProducts(product);
     }
@@ -94,7 +80,7 @@ function CreateProducts({ fetchProducts, createProducts }) {
             <h1 className={classes.title}>Créer un produit</h1>
 
             <form className={classes.root} noValidate autoComplete="off" onSubmit={onsubmit}>
-                <TextField id="outlined-basic" label="Nom" variant="outlined" value={name} onChange={onChangeName} required />
+                <TextField id="outlined-basic" label="Nom" variant="outlined" onChange={onChangeName} required />
                 <TextField id="outlined-basic" label="Type" variant="outlined" value={type} onChange={onChangeType} required />
                 <TextField type="number" id="outlined-basic" label="Prix" variant="outlined" value={price} onChange={onChangePrice} required />
                 <TextField id="outlined-basic" label="Note" variant="outlined" value={rating} onChange={onChangeRating} required />
@@ -118,16 +104,31 @@ function CreateProducts({ fetchProducts, createProducts }) {
     )
 }
 
+//IMPORT ALL STATES FROM REDUX
 const mapStateToProps = (state) => {
     return {
-        products: state.fetchProductsReducers.products
+        products: state.fetchProductsReducers.products,
+        name: state.changeProductsReducers.name,
+        type: state.changeProductsReducers.type,
+        price: state.changeProductsReducers.price,
+        rating: state.changeProductsReducers.rating,
+        warranty_years: state.changeProductsReducers.warranty_years,
+        available: state.changeProductsReducers.available,
+        product: state.changeProductsReducers
     }
 }
 
+//IMPORT ALL ACTIONS FROM REDUX
 const mapDispatchToProps = (dispatch) => {
     return {
         fetchProducts: () => dispatch(fetchProducts()),
-        createProducts: (product) => dispatch(createProducts(product))
+        createProducts: (product) => dispatch(createProducts(product)),
+        changeName: (name) => dispatch(changeName(name)),
+        changeType: (type) => dispatch(changeType(type)),
+        changePrice: (price) => dispatch(changePrice(price)),
+        changeRating: (rating) => dispatch(changeRating(rating)),
+        changeWarranty: (warranty) => dispatch(changeWarranty(warranty)),
+        changeAvailable: (available) => dispatch(changeAvailable(available))
     }
 }
 

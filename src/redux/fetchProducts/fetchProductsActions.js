@@ -54,32 +54,3 @@ export const deleteProducts = (id) => {
         dispatch(fetchProductsSuccess(productsDeleted));
     }
 }
-
-//CREATE A PRODUCT
-export const createProducts = (product) => {
-    return (dispatch) => {
-        Axios.post('http://localhost:5000/products/add', product)
-            .then(res => console.log(res.data))
-            .catch((err) => {
-                console.log(err);
-            })
-
-        //RETURN TO THE "/" LOCATION
-        window.location = '/'
-    }
-}
-
-export const editProducts = (param, product) => {
-    return (dispatch) => {
-        Axios.post('http://localhost:5000/products/update/' + param, product)
-            .then(res => console.log(res.data))
-            .catch((err) => {
-                console.log(err);
-            })
-
-        //RETURN TO THE "/" LOCATION
-        window.location = '/'
-    }
-}
-
-console.log(productsFetched);
