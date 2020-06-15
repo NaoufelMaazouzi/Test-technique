@@ -21,7 +21,7 @@ export const changeRatingActions = (rating) => ({
 });
 
 export const changeWarrantyActions = (warranty_years) => ({
-    type: 'CHANGE_warranty_years',
+    type: 'CHANGE_WARRANTY_YEARS',
     payload: warranty_years,
 });
 

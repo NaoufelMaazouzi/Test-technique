@@ -79,8 +79,6 @@ function CreateProducts({
     createProducts(product);
   }
 
-  console.log(product)
-
   const classes = useStyles();
 
   return (

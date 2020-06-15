@@ -16,7 +16,7 @@ import {
 const ENDPOINT = 'localhost:5000';
 let socket;
 
-// IMPORT OF ALL STATE & ACTIONS FROM THE REDUX STORE
+// IMPORT OF ALL STATES & ACTIONS FROM THE REDUX STORE
 const EditProducts = ({
   match, editProducts, product, changeName, changeType, changePrice, changeRating, changeWarranty, changeAvailable, name, type, price, rating, warranty_years, available, fetchNewProduct,
 }) => {
